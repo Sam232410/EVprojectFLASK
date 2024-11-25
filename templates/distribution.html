@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Distribution Chart</title>
+
+      <!-- Montserrat Font -->
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+      <!-- Material Icons -->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+      
+      <!-- Custom CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+</head>
+<body>
+    <h1>Dynamic Distribution Chart</h1>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <span class="material-icons-outlined">electric_car</span> EV FLEET
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+    
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item">
+                    <a href="index">
+                        <span class="material-icons-outlined">library_books</span> EV-Introduction
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="dataset">
+                        <span class="material-icons-outlined">dataset</span>
+                        DataSet
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/distribution">
+                        <span class="material-icons-outlined">show_chart</span> Distribution
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/relation">
+                        <span class="material-icons-outlined">account_tree</span> RelationShip
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/status">
+                        <span class="material-icons-outlined">check_circle</span> StatusCount
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/pie">
+                      <span class="material-icons-outlined">donut_large</span> PieChart
+                    </a>
+                  </li>
+                  <li class="sidebar-list-item">
+                    <a href="/predict">
+                      <span class="material-icons-outlined">analytics</span>Prediction
+                    </a>
+                  </li>
+                  <li class="sidebar-list-item">
+                    <a href="/login">
+                       <span class="material-icons-outlined">logout</span>LogOut
+                   </a>
+                   </li>
+            </ul>
+        </aside>
+        <!-- End Sidebar -->
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="main-title">
+           <!-- Dropdown -->
+    <label for="columnSelect">Select Column:</label>
+    <select id="columnSelect"></select>
+            <!-- Options will be populated dynamically -->
+        </select>        
+    </div>
+    <div id="chart" style="margin-top: 150px; width: 100%; height: 500px;"></div>
+</main>
+</div>
+
+<!-- End Main Content -->
+ 
+
+    <!-- Chart -->
+   
+
+    <script>
+        const dropdown = document.getElementById('columnSelect');
+        const defaultColumn = "Battery Level (%)"; // Change this to any data column you want to default to
+        console.log('Default Column Selected:', defaultColumn); // Debug log
+
+        // Function to load headers into the dropdown
+        function loadHeaders() {
+            fetch('/data?action=headers')
+                .then(response => response.json())
+                .then(headers => {
+                    console.log('Headers fetched:', headers); // Debug log
+                    headers.forEach(header => {
+                        const option = document.createElement('option');
+                        option.value = header;
+                        option.textContent = header;
+                        dropdown.appendChild(option);
+                    });
+        
+                    // Select the default column
+                    if (headers.includes(defaultColumn)) {
+                        dropdown.value = defaultColumn;
+                        console.log('Default column selected:', defaultColumn); // Debug log
+                        fetchDataAndRenderChart(defaultColumn);
+                    }
+                })
+                .catch(error => console.error('Error fetching headers:', error));
+        }
+        
+        // Function to fetch data and render the chart
+        function fetchDataAndRenderChart(column) {
+            fetch(`/data?action=column&column=${column}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+        
+                console.log('Raw Data:', data); // Debug: Check raw data
+        
+                // Normalize data: trim whitespace and convert to consistent type (e.g., number or string)
+                const validData = data
+                    .map(value => value.trim())  // Remove whitespace
+                    .filter(value => value !== '' && value !== null && value !== undefined);
+        
+                console.log('Valid Data after trimming:', validData); // Debug: Print data after trimming
+        
+                // If the data should be numbers, convert them to numbers
+                const isNumeric = validData.every(value => !isNaN(value));
+                if (isNumeric) {
+                    validData.forEach((value, index) => validData[index] = Number(value)); // Convert to number
+                }
+        
+                console.log('Valid Data after normalization:', validData); // Debug: Print data after normalization
+        
+                // Count the frequency of each unique value
+                const valueCounts = {};
+                validData.forEach(value => {
+                    valueCounts[value] = (valueCounts[value] || 0) + 1;
+                });
+        
+                console.log('Value Counts:', valueCounts); // Debug: Print the value counts
+        
+                // Sort values for easier visualization
+                const sortedValues = Object.keys(valueCounts).sort((a, b) => a - b);
+                const sortedCounts = sortedValues.map(value => valueCounts[value]);
+        
+                console.log('Sorted Values:', sortedValues); // Debug: Print sorted unique values
+                console.log('Sorted Counts:', sortedCounts); // Debug: Print sorted counts
+        
+                // Prepare hover text to display on each bar
+                const hoverText = sortedValues.map((value, index) => {
+                    return `Value: ${value}<br>Count: ${sortedCounts[index]}`;
+                });
+        
+                // Plotly data trace
+                const trace = {
+                    x: sortedValues, // Use unique values for x-axis
+                    y: sortedCounts.map(count => Math.floor(count)), // Ensure counts are integers (no decimals)
+                    type: 'bar', // Bar chart instead of histogram
+                    marker: { color: '#FF7F50' },
+                    text: hoverText, // Add hover text
+                    hoverinfo: 'text', // Specify that hover info will come from `text`
+                };
+        
+                const layout = {
+                    title: `Distribution of ${column}`,
+                    xaxis: { title: column },
+                    yaxis: { title: 'Count' },
+                    bargap: 0.05
+                };
+        
+                Plotly.newPlot('chart', [trace], layout);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Update chart on dropdown change
+        dropdown.addEventListener('change', () => {
+            console.log('Column selected:', dropdown.value); // Debug log to check the selected column
+            fetchDataAndRenderChart(dropdown.value); // Use the selected column
+        });
+
+        // Load headers and initialize chart on page load
+        loadHeaders();
+    </script>
+</body>
+</html>

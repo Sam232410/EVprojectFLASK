@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Relation Chart</title>
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+</head>
+<body>
+    <h1>Relation Between Two Columns</h1>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <span class="material-icons-outlined">electric_car</span> EV FLEET
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+    
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item">
+                    <a href="index" >
+                        <span class="material-icons-outlined">library_books</span> EV-Introduction
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="dataset">
+                        <span class="material-icons-outlined">dataset</span>
+                        DataSet
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/distribution">
+                        <span class="material-icons-outlined">show_chart</span> Distribution
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/relation">
+                        <span class="material-icons-outlined">account_tree</span> RelationShip
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/status">
+                        <span class="material-icons-outlined">check_circle</span> StatusCount
+                    </a>
+                    <li class="sidebar-list-item">
+                        <a href="/pie">
+                          <span class="material-icons-outlined">donut_large</span> PieChart
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/predict">
+                          <span class="material-icons-outlined">analytics</span>Prediction
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/login">
+                           <span class="material-icons-outlined">logout</span>LogOut
+                       </a>
+                       </li>
+            </ul>
+        </aside>
+        <!-- End Sidebar -->
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="main-title">
+       <!-- Dropdowns for selecting X and Y columns -->
+    <label for="columnXSelect">Select X Column:</label>
+    <select id="columnXSelect"></select>
+
+    <label for="columnYSelect">Select Y Column:</label>
+    <select id="columnYSelect"></select>
+ 
+            <!-- Options will be populated dynamically -->
+        </select>        
+    </div>
+     <!-- Chart -->
+     <div id="chart" style="margin-top:150px ;width: 100%; height: 500px;"></div>
+</main>
+</div>
+
+<!-- End Main Content -->
+  
+
+   
+
+    <script>
+        const dropdownX = document.getElementById('columnXSelect');
+        const dropdownY = document.getElementById('columnYSelect');
+
+        let headers = [];
+
+        // Function to load headers into the dropdowns
+        function loadHeaders() {
+            fetch('/data?action=headers')
+                .then(response => response.json())
+                .then(data => {
+                    headers = data;
+                    headers.forEach(header => {
+                        // Populate both X and Y column dropdowns
+                        const optionX = document.createElement('option');
+                        optionX.value = header;
+                        optionX.textContent = header;
+                        dropdownX.appendChild(optionX);
+
+                        const optionY = document.createElement('option');
+                        optionY.value = header;
+                        optionY.textContent = header;
+                        dropdownY.appendChild(optionY);
+                    });
+
+                    // Select default columns for both X and Y
+                    const defaultColumnX = "Battery Level (%)";
+                    const defaultColumnY = "Range (km)";
+                    dropdownX.value = defaultColumnX;
+                    dropdownY.value = defaultColumnY;
+
+                    // Fetch and render data for default columns
+                    fetchDataAndRenderChart(defaultColumnX, defaultColumnY);
+                })
+                .catch(error => console.error('Error fetching headers:', error));
+        }
+
+        // Fetch and render data for the selected columns
+        function fetchDataAndRenderChart(columnX, columnY) {
+            // Fetch data for the X and Y columns
+            fetch(`/data?action=column&column=${columnX}`)
+                .then(response => response.json())
+                .then(dataX => {
+                    fetch(`/data?action=column&column=${columnY}`)
+                        .then(response => response.json())
+                        .then(dataY => {
+                            // Normalize and clean data for both X and Y
+                            const validDataX = dataX
+                                .map(value => value.trim())
+                                .filter(value => value !== '' && value !== null && value !== undefined)
+                                .map(value => !isNaN(value) ? Number(value) : value);
+                            const validDataY = dataY
+                                .map(value => value.trim())
+                                .filter(value => value !== '' && value !== null && value !== undefined)
+                                .map(value => !isNaN(value) ? Number(value) : value);
+
+                            // Prepare hover text
+                            const hoverText = validDataX.map((xValue, index) => {
+                                return `X: ${columnX}: ${xValue}<br>Y: ${columnY}: ${validDataY[index]}`;
+                            });
+
+                            // Plotly scatter plot data trace
+                            const trace = {
+                                x: validDataX,
+                                y: validDataY,
+                                mode: 'markers',
+                                marker: { color: '#FF7F50' },
+                                text: hoverText,
+                                hoverinfo: 'text', // Show custom hover info
+                            };
+
+                            // Layout
+                            const layout = {
+                                title: `Relation Between ${columnX} and ${columnY}`,
+                                xaxis: { title: columnX },
+                                yaxis: { title: columnY },
+                                hovermode: 'closest', // Enable hover
+                            };
+
+                            // Render the chart
+                            Plotly.newPlot('chart', [trace], layout);
+                        })
+                        .catch(error => console.error('Error fetching Y column data:', error));
+                })
+                .catch(error => console.error('Error fetching X column data:', error));
+        }
+
+        // Event listeners for dropdown change
+        dropdownX.addEventListener('change', () => {
+            fetchDataAndRenderChart(dropdownX.value, dropdownY.value);
+        });
+
+        dropdownY.addEventListener('change', () => {
+            fetchDataAndRenderChart(dropdownX.value, dropdownY.value);
+        });
+
+        // Load headers on page load
+        loadHeaders();
+    </script>
+</body>
+</html>

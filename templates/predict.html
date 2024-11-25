@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Relation Chart</title>
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+</head>
+<body>
+    <h1>Range Prediction</h1>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <span class="material-icons-outlined">electric_car</span> EV FLEET
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+    
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item">
+                    <a href="index" >
+                        <span class="material-icons-outlined">library_books</span> EV-Introduction
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="dataset">
+                        <span class="material-icons-outlined">dataset</span>
+                        DataSet
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/distribution">
+                        <span class="material-icons-outlined">show_chart</span> Distribution
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/relation">
+                        <span class="material-icons-outlined">account_tree</span> RelationShip
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/status">
+                        <span class="material-icons-outlined">check_circle</span> StatusCount
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/pie">
+                      <span class="material-icons-outlined">donut_large</span> PieChart
+                    </a>
+                  </li>
+                  <li class="sidebar-list-item">
+                    <a href="/predict">
+                      <span class="material-icons-outlined">analytics</span>Prediction
+                    </a>
+                  </li>
+                  <li class="sidebar-list-item">
+                    <a href="/login">
+                       <span class="material-icons-outlined">logout</span>LogOut
+                   </a>
+                   </li>
+            </ul>
+        </aside>
+        <!-- End Sidebar -->
+  
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="main-title">
+                <!-- Form for Battery Level Input -->
+                <form action="{{ url_for('predict') }}" method="post">
+                    <br><br>
+                    <label for="model_id">Model ID:</label>
+                    <select name="model_id" id="model_id">
+                        <option value="1">Tesla 1</option>
+                        <option value="2">Hyundai</option>
+                        <option value="3">BMW</option>
+                        <option value="4">Polestar</option>
+                        <option value="5">Volkswagen</option>
+                    </select>
+                    <br> <br>
+                    <label for="battery">Battery Level (%):</label>
+                    <input type="text" name="battery" id="battery" required><br><br>
+                
+                    <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+                </form>
+                <br><br>
+                
+                <!-- Display Prediction Result -->
+                <div class="prediction-result">
+                    {% if prediction_text %}
+                        <p>{{ prediction_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            
+            <div class="intro-info">
+                <div class="intro-Info">
+                    <h4>Tesla</h4>
+                    <p>Tesla’s electric vehicles are renowned for their exceptional range, cutting-edge technology, 
+                        and high performance. Tesla cars are equipped with autopilot features and advanced safety systems. 
+                        They are also known for their long-range capabilities and are a popular choice among electric vehicle 
+                        enthusiasts looking for both style and sustainability.</p>
+                </div>
+                <div class="intro-Info">
+                    <h4>Hyundai</h4>
+                    <p>Hyundai offers a variety of affordable electric vehicles known for their practicality, value for money, 
+                        and efficient performance. Hyundai’s EVs typically provide good range on a single charge, making them ideal 
+                        for daily commuting. They also feature sleek designs and modern tech at a competitive price.</p>
+                </div>
+                <div class="intro-Info">
+                    <h4>BMW</h4>
+                    <p>BMW's electric vehicles combine luxury with performance. These cars are known for their premium interiors, high-tech features, 
+                        and an enjoyable driving experience. They focus on sustainability without compromising on performance, offering a comfortable ride
+                         with impressive battery efficiency.</p>
+                </div>
+                <div class="intro-Info">
+                    <h4>Polestar</h4>
+                    <p>Polestar is Volvo’s high-performance electric vehicle brand, focused on creating stylish, eco-friendly cars with top-notch technology. 
+                        Polestar vehicles offer a premium driving experience with cutting-edge features and an emphasis on sustainability, making them a great 
+                        choice for those seeking both luxury and environmental consciousness.</p>
+                </div>
+                <div class="intro-Info">
+                    <h4>Volkswagen </h4>
+                    <p>Volkswagen’s electric vehicle lineup is known for modern design and solid performance at a more accessible price. 
+                        These cars offer good range and the latest technology features. Volkswagen focuses on creating vehicles that are both user-friendly 
+                        and eco-friendly, making them a great option for those seeking practicality and innovation in an EV.</p>
+                </div>
+              
+
+
+        </main>
+        <!-- End Main Content -->
+    </div>
+
+
+
+
+</body>
+</html>

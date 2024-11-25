@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(145deg, #000000, #4d4857);
+        }
+
+        .container {
+            width: 400px;
+            padding: 20px 25px;
+            background-color: #3b3b3b;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 90%;
+            padding: 12px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 8px;
+            background: #575757;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border: 2px solid #007bff;
+            background: #6c6c6c;
+        }
+
+        button {
+            width: 95%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.03);
+        }
+
+        .create-account {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .create-account a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .create-account a:hover {
+            text-decoration: underline;
+        }
+
+        a#forgotPasswordLink {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        a#forgotPasswordLink:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="POST" action="{{ url_for('login') }}">
+            <input type="text" name="email_or_phone" placeholder="Email or Phone Number" required><br>
+            <input type="password" name="password" placeholder="Password" required><br><br>
+            <button type="submit">Login</button>
+        </form>
+        <br>
+        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+        <br>
+        <div class="create-account">
+            <p>New user? <a href="{{ url_for('register') }}">Create an Account</a></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('forgotPasswordLink').addEventListener('click', function () {
+            const input = prompt("Please enter your registered email or phone number:");
+            if (input) {
+                alert(`Password reset link sent to ${input}.`);
+            }
+        });
+    </script>
+</body>
+</html>

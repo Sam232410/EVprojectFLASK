@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <div class="grid-container">
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">electric_car</span> EV FLEET
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="index">
+              <span class="material-icons-outlined">library_books</span> EV-Introduction
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="dataset">
+              <span class="material-icons-outlined">dataset</span>
+              DataSet
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/distribution">
+              <span class="material-icons-outlined">show_chart</span> Distribution
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/relation">
+              <span class="material-icons-outlined">account_tree</span> RelationShip
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/status">
+              <span class="material-icons-outlined">check_circle</span> StatusCount
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/pie">
+              <span class="material-icons-outlined">donut_large</span> PieChart
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/predict">
+              <span class="material-icons-outlined">analytics</span>Prediction
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/login">
+               <span class="material-icons-outlined">logout</span>LogOut
+           </a>
+           </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-content">
+        <div class="welcome-msg">
+
+          <h3>Welcome, Admin!</h3>
+            <h4>Here’s a brief overview of your EV Fleet. You can access detailed vehicle performance data by exploring the sections above.</h4>
+        </div>
+
+        <div class="intro-content">
+            <div class="intro-section">
+                <h4>Vehicle ID</h4>
+                <p>Each vehicle in the fleet is uniquely identified by an ID. This helps distinguish between different EVs for easy reference and management.</p>
+            </div>
+            <div class="intro-section">
+                <h4>Make</h4>
+                <p>The Make of the EV refers to the manufacturer or brand of the vehicle, helping you understand its origin and the quality standards it adheres to.</p>
+            </div>
+            <div class="intro-section">
+                <h4>Driver</h4>
+                <p>The Driver column shows the person assigned to drive the vehicle, ensuring accountability and proper assignment within the fleet.</p>
+            </div>
+            <div class="intro-section">
+                <h4>Manager</h4>
+                <p>This indicates the Manager overseeing the specific vehicle’s operations, ensuring efficient management and maintenance of the fleet.</p>
+            </div>
+            <div class="intro-section">
+                <h4>Total Power (hp)</h4>
+                <p>This refers to the total power output of the vehicle’s motor(s), indicating the overall performance capacity in terms of horsepower.</p>
+            </div>
+            <div class="intro-section">
+                <h4>Range</h4>
+                <p>The Range column shows how far the vehicle can travel on a single charge. This is a critical parameter for fleet management to ensure long-distance travel and timely recharging.</p>
+            </div>
+        </div>
+
+
+
+        </div>
+      </main>
+      <!-- End Main -->
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- ApexCharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.5/apexcharts.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

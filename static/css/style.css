@@ -1,0 +1,364 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #2b2b2b;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.material-icons-outlined {
+  vertical-align: middle;
+  line-height: 1px;
+  font-size: 35px;
+}
+
+/* Grid Layout for Sidebar and Main Content */
+.grid-container {
+  display: grid;
+  grid-template-columns: 260px 1fr; /* Sidebar and Main content */
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+      'sidebar header'
+      'sidebar main';
+  height: 100vh;
+}
+
+/* Sidebar Styles */
+#sidebar {
+  grid-area: sidebar;
+  height: 100%;
+  background-color: #414141;
+  overflow-y: auto;
+  transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+}
+
+.sidebar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+.sidebar-title > span {
+  display: none;
+}
+
+.sidebar-brand {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sidebar-list {
+  padding: 0;
+  margin-top: 15px;
+  list-style-type: none;
+}
+
+.sidebar-list-item {
+  margin: 10px 20px; /* Spacing between items */
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-list-item:hover {
+  background: linear-gradient(145deg, #575757, #6c6c6c); /* Hover effect */
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3); /* Enhanced hover shadow */
+  transform: scale(1.03); /* Slight zoom effect */
+  cursor: pointer;
+}
+
+.sidebar-list-item > a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-list-item > a span {
+  margin-right: 10px; /* Spacing between icon and text */
+}
+
+
+/* Main Content Styles */
+.main-container {
+  grid-area: main;
+  background: linear-gradient(145deg, #3b3b3b, #292929);
+  box-shadow: 5px 5px 15px #1a1a1a, -5px -5px 15px #4c4c4c;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 40px);
+  /* grid-area: main;
+  background: linear-gradient(145deg, #3b3b3b, #292929);
+  box-shadow: 5px 5px 15px #1a1a1a, -5px -5px 15px #4c4c4c;
+  border-radius: 10px;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.95);
+  overflow-y: auto; */
+}
+
+.main-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Pie Chart Styling */
+#pieChart {
+  width: 100%;
+  height: 400px;
+  margin-top: 20px;
+}
+
+/* Media Queries for Responsiveness */
+@media screen and (max-width: 992px) {
+  .grid-container {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+          'header'
+          'main';
+  }
+
+  #sidebar {
+      display: none;
+      height: 100%; /* Full height */
+
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .main-container {
+      padding: 10px;
+  }
+}
+h1 {
+  position: absolute;
+      
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000; /* Ensure it stays above other elements */
+}
+
+
+   /* Align dropdown to the sidebar */
+   .main-title {
+    position: absolute;
+    top: 90px; /* Adjust based on how far down you want it */
+    left: 270px; /* Sidebar width + some margin */
+    display: flex;
+    gap: 10px; /* Space between label and dropdown */
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
+    z-index: 10; /* Ensure it appears above other elements */
+}
+
+#columnSelect {
+    padding: 5px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+    /* Ensure pie chart does not overlap */
+    #pieChart {
+      margin-top: 150px; /* Add space below the dropdown */
+      width: 100%; 
+      height: 700px;
+  }
+
+  
+
+
+
+/* Main Content Styles */
+.main-content {
+  grid-area: main;
+  padding: 20px 30px;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(145deg, #3b3b3b, #292929);
+  box-shadow: 5px 5px 15px #1a1a1a, -5px -5px 15px #4c4c4c;
+  border-radius: 10px;
+  overflow-y: auto;
+  height: calc(100vh - 40px); /* Adjust height dynamically */
+}
+
+/* Welcome Message Styles */
+.welcome-msg {
+  background-color: #4c4c4c;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-msg h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.welcome-msg h4 {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Intro Content Styling */
+.intro-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.intro-section {
+  background-color: #3b3b3b;
+  padding: 15px 20px;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: inset 2px 2px 5px #292929, inset -2px -2px 5px #4c4c4c;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.intro-section:hover {
+  transform: scale(1.03);
+  box-shadow: 4px 4px 10px #1a1a1a, -4px -4px 10px #4c4c4c;
+}
+
+.intro-section h4 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.intro-section p {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+/* Scrollbar Customization */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: #2b2b2b;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Media Queries for Smaller Screens */
+@media screen and (max-width: 768px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .intro-section {
+    padding: 10px 15px;
+  }
+
+  .welcome-msg h3 {
+    font-size: 20px;
+  }
+
+  .welcome-msg h4 {
+    font-size: 16px;
+  }
+}
+
+
+.prediction-result {
+  position: absolute;
+  top: 180px; /* Adjust based on how far down you want it */
+  left: 20px; /* Sidebar width + some margin */
+  display: flex;
+  padding: 15px;
+  background-color: #383838;
+  border-radius: 8px;
+  border: 1px solid #585858;
+  text-align: center;
+  width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.prediction-result p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #eeeeee; /* Green for positive results */
+  margin: 0;
+}
+
+.prediction-result p.error {
+  color: #f44336; /* Red for errors or invalid input */
+}
+
+
+
+/* MODEL INFO ON PREDICTION */
+.intro-info {
+  position: absolute;
+  top: 360px;  /* Keeps space for any header or upper elements */
+  left: 250px; /* Sidebar width + margin */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  width: calc(100% - 250px); /* Ensures it doesn't extend under the sidebar */
+  padding: 20px;  /* Optional for some padding around the grid */
+  word-wrap: break-word;  /* Ensures long words break and wrap properly */
+  box-sizing: border-box;  /* Include padding in width calculation */
+}
+
+/* Styling for each info section */
+.intro-Info {
+  background-color: #3b3b3b;
+  padding: 15px 20px;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: inset 2px 2px 5px #292929, inset -2px -2px 5px #4c4c4c;
+  transition: transform 0.3s, box-shadow 0.3s;
+  word-wrap: break-word;  /* Handle long word wrapping */
+}
+
+.intro-Info:hover {
+  transform: scale(1.03);
+  box-shadow: 4px 4px 10px #1a1a1a, -4px -4px 10px #4c4c4c;
+}
+
+.intro-Info h4 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.intro-Info p {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+

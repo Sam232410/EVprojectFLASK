@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Dataset</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+</head>
+<body>
+    <body>
+        <div class="grid-container">
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <div class="sidebar-title">
+                    <div class="sidebar-brand">
+                        <span class="material-icons-outlined">electric_car</span> EV FLEET
+                    </div>
+                    <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+                </div>
+    
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item">
+                        <a href="index">
+                            <span class="material-icons-outlined">library_books</span> EV-Introduction
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="dataset">
+                            <span class="material-icons-outlined">dataset</span> DataSet
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="/distribution">
+                            <span class="material-icons-outlined">show_chart</span> Distribution
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="/relation">
+                            <span class="material-icons-outlined">account_tree</span> RelationShip
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="/status">
+                            <span class="material-icons-outlined">check_circle</span> StatusCount
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="/pie">
+                          <span class="material-icons-outlined">donut_large</span> PieChart
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/predict">
+                          <span class="material-icons-outlined">analytics</span>Prediction
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/login">
+                           <span class="material-icons-outlined">logout</span>LogOut
+                       </a>
+                       </li>
+                </ul>
+            </aside>
+            <!-- End Sidebar -->
+    
+            <!-- Main Content -->
+            <div class="data-box">
+                <table>
+                    <thead>
+                        <tr>
+                            {% for col in header %}
+                                <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr>
+                                {% for item in row %}
+                                    <td>{{ item }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+    
+</html>
