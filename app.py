@@ -1,24 +1,35 @@
 import csv
-from flask import Flask, jsonify, render_template, request
-import pandas as pd
-import pickle
-import numpy as np
-
-from flask import Flask, render_template, request, redirect, url_for, flash, session # type: ignore
-from flask_sqlalchemy import SQLAlchemy # type: ignore
-from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from flask_migrate import Migrate # type: ignore
-from flask_mysqldb import MySQL # type: ignore
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_mail import Mail, Message
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import re
+import pickle
+import numpy as np
+import pandas as pd
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
+
 
 # Initialize Flask app and database
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'  # Your MySQL URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'your_secret_key_here'  # For flash messages and session
+app.secret_key = 'your_secret_key_here'
 
-# Initialize SQLAlchemy and Flask-Migrate
+
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'email23testing@gmail.com'  # Replace with your email
+app.config['MAIL_PASSWORD'] = 'owpp amrr cdbi soog'         # Replace with your email password
+app.config['MAIL_DEFAULT_SENDER'] = 'email23testing@gmail.com'
+
+# Initialize Flask-Mail and SQLAlchemy
+mail = Mail(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -31,6 +42,10 @@ class User(db.Model):
     dob = db.Column(db.Date, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), nullable=False)
+    reset_token = db.Column(db.String(256), nullable=True)
+    
+    def __repr__(self):
+        return f'<User {self.name}>'
 
 
 
@@ -155,6 +170,89 @@ def login():
             return redirect(url_for('login'))  # Stay on login page if login fails
 
     return render_template('login.html')  # Use a separate template for login if needed
+
+
+#####FORGOT-PASSWORD
+
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Generate a temporary password reset token
+            reset_token = generate_password_hash(f"{email}{datetime.now()}", method='pbkdf2:sha256')
+            user.reset_token = reset_token
+            db.session.commit()  # Save the token to the database
+
+            # Send password reset email
+            try:
+                reset_link = f"http://localhost:5000/reset_password?token={reset_token}"
+                msg = Message(
+                    'Password Reset Request',
+                    recipients=[email],
+                    body=f"Hi {user.name},\n\nClick the link below to reset your password:\n"
+                         f"{reset_link}\n\n"
+                         f"If you did not request a password reset, please ignore this email.\n\nBest regards,\nEV System Team"
+                )
+                mail.send(msg)
+                flash('Password reset link sent to your email.', 'success')
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                flash('Error sending email. Please try again later.', 'error')
+        else:
+            flash('Email not registered.', 'error')
+
+        return redirect(url_for('login'))
+    return render_template('forgot_password.html')
+
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    reset_token = request.args.get('token')  
+    if not reset_token:
+        flash("Invalid password reset request.", "error")
+        return redirect(url_for('forgot_password'))
+
+    user = User.query.filter_by(reset_token=reset_token).first()
+    if not user:
+        flash("Invalid or expired token.", "error")
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if new_password != confirm_password:
+            flash("Passwords do not match. Please try again.", "error")
+            return render_template('reset_password.html', token=reset_token)
+
+        hashed_password = generate_password_hash(new_password)
+        user.password = hashed_password
+        user.reset_token = None  # Clear the reset token after password change
+        db.session.commit()  # Save changes to the database
+
+        flash("Your password has been successfully updated!", "success")
+        return redirect(url_for('login'))  # Redirect to login page after success
+
+    return render_template('reset_password.html', token=reset_token)
+
+
+def send_welcome_email(email, name):
+    try:
+        msg = Message('Welcome to EV System', recipients=[email])
+        msg.body = f"Hi {name},\n\nThank you for registering with us!\n\nBest regards,\nEV System Team"
+        mail.send(msg)
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+
+
+
 
 
 
