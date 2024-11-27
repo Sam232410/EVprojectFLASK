@@ -13,13 +13,30 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import smtplib
 import plotly.express as px
 import plotly.io as pio
+import os
+
+
 
 
 # Initialize Flask app and database
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'your_secret_key_here'
+
+
+import os
+from sqlalchemy import create_engine
+
+mysql_host = os.getenv("localhost")
+mysql_user = os.getenv("root")
+mysql_password = os.getenv("sam")
+mysql_db = os.getenv("evUSERS")
+
+engine = create_engine(f'mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}')
+
+
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.secret_key = 'your_secret_key_here'
 
 
 # Email configuration
