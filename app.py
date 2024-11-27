@@ -22,15 +22,15 @@ import os
 app = Flask(__name__)
 
 
-import os
-from sqlalchemy import create_engine
+# import os
+# from sqlalchemy import create_engine
 
-mysql_host = os.getenv("localhost")
-mysql_user = os.getenv("root")
-mysql_password = os.getenv("sam")
-mysql_db = os.getenv("evUSERS")
+# mysql_host = os.getenv("localhost")
+# mysql_user = os.getenv("root")
+# mysql_password = os.getenv("sam")
+# mysql_db = os.getenv("evUSERS")
 
-engine = create_engine(f'mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}')
+# engine = create_engine(f'mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}')
 
 
 
