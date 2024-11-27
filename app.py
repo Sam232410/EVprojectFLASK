@@ -87,24 +87,27 @@ def loginpg():
     return render_template('login.html')
 
 
-# Route for the registration page
+
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        # Retrieving form data
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        dob = request.form.get('dob')  # Date as a string
+        dob = request.form.get('dob')
         password = request.form.get('password')
         confirm_password = request.form.get('confirmPassword')
         role = request.form.get('role')
 
-        # Password matching validation
+        # Check if passwords match
         if password != confirm_password:
             flash('Passwords do not match!', 'error')
             return redirect(url_for('register'))
 
-        # Validate email format
+        # Check email format
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('Invalid email format!', 'error')
             return redirect(url_for('register'))
@@ -112,35 +115,102 @@ def register():
         # Check if email or phone already exists
         existing_user = User.query.filter((User.email == email) | (User.phone == phone)).first()
         if existing_user:
-            flash('Email or Phone number already registered. Please use a different one.', 'error')
+            flash('Email or Phone number already registered.', 'error')
             return redirect(url_for('register'))
 
-        # Convert DOB string to datetime object
+        # Validate date of birth format
         try:
             dob = datetime.strptime(dob, '%Y-%m-%d').date()
         except ValueError:
-            flash('Invalid date format! Please use YYYY-MM-DD.', 'error')
+            flash('Invalid date format! Use YYYY-MM-DD.', 'error')
             return redirect(url_for('register'))
 
         # Hash the password
         hashed_password = generate_password_hash(password)
-
-        # Create a new user and add to the database
+        
+        # Create a new user
         new_user = User(name=name, email=email, phone=phone, dob=dob, password=hashed_password, role=role)
-        db.session.add(new_user)
-        db.session.commit()
+        
+        # Add the new user to the database
+        try:
+            db.session.add(new_user)
+            db.session.commit()
 
-        # Set session variables for the newly registered user
-        session['user_id'] = new_user.id
-        session['user_name'] = new_user.name
-        session['user_role'] = new_user.role
+            # Send a welcome email
+            send_welcome_email(email, name)
+            
+            # Store user details in the session
+            session['user_id'] = new_user.id
+            session['user_name'] = new_user.name
+            session['user_role'] = new_user.role
 
-        flash('Registration successful! Please log in to continue.', 'success')
-
-        # Redirect to login page after successful registration
-        return redirect(url_for('login'))  # Now it redirects to login page
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))  # Redirect to login page
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'error')
+            return redirect(url_for('register'))
 
     return render_template('registration.html')
+
+
+
+
+
+# Route for the registration page
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == 'POST':
+#         name = request.form.get('name')
+#         email = request.form.get('email')
+#         phone = request.form.get('phone')
+#         dob = request.form.get('dob')  # Date as a string
+#         password = request.form.get('password')
+#         confirm_password = request.form.get('confirmPassword')
+#         role = request.form.get('role')
+
+#         # Password matching validation
+#         if password != confirm_password:
+#             flash('Passwords do not match!', 'error')
+#             return redirect(url_for('register'))
+
+#         # Validate email format
+#         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+#             flash('Invalid email format!', 'error')
+#             return redirect(url_for('register'))
+
+#         # Check if email or phone already exists
+#         existing_user = User.query.filter((User.email == email) | (User.phone == phone)).first()
+#         if existing_user:
+#             flash('Email or Phone number already registered. Please use a different one.', 'error')
+#             return redirect(url_for('register'))
+
+#         # Convert DOB string to datetime object
+#         try:
+#             dob = datetime.strptime(dob, '%Y-%m-%d').date()
+#         except ValueError:
+#             flash('Invalid date format! Please use YYYY-MM-DD.', 'error')
+#             return redirect(url_for('register'))
+
+#         # Hash the password
+#         hashed_password = generate_password_hash(password)
+
+#         # Create a new user and add to the database
+#         new_user = User(name=name, email=email, phone=phone, dob=dob, password=hashed_password, role=role)
+#         db.session.add(new_user)
+#         db.session.commit()
+
+#         # Set session variables for the newly registered user
+#         session['user_id'] = new_user.id
+#         session['user_name'] = new_user.name
+#         session['user_role'] = new_user.role
+
+#         flash('Registration successful! Please log in to continue.', 'success')
+
+#         # Redirect to login page after successful registration
+#         return redirect(url_for('login'))  # Now it redirects to login page
+
+#     return render_template('registration.html')
 
 # Route for the login page
 @app.route('/login', methods=['GET', 'POST'])
