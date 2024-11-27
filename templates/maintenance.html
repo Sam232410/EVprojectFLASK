@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Costs</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+</head>
+<body>
+    <h1>Maintenance Costs by Vehicle Make</h1>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+          <div class="sidebar-title">
+            <div class="sidebar-brand">
+              <span class="material-icons-outlined">electric_car</span> EV FLEET
+            </div>
+            <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+          </div>
+  
+          <ul class="sidebar-list">
+            <li class="sidebar-list-item">
+              <a href="index">
+                <span class="material-icons-outlined">library_books</span> EV-Introduction
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="dataset">
+                <span class="material-icons-outlined">dataset</span>
+                DataSet
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="/distribution">
+                <span class="material-icons-outlined">show_chart</span> Distribution
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="/relation">
+                <span class="material-icons-outlined">account_tree</span> RelationShip
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="/status">
+                <span class="material-icons-outlined">check_circle</span> StatusCount
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="/pie">
+                <span class="material-icons-outlined">donut_large</span> PieChart
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+              <a href="/predict">
+                <span class="material-icons-outlined">analytics</span>Prediction
+              </a>
+            </li>
+            <li class="sidebar-list-item">
+                <a href="/maintenance">
+                    <span class="material-icons-outlined">build</span> Maintenance
+                </a>
+            </li>
+            
+            <li class="sidebar-list-item">
+                <a href="/behavior">
+                    <span class="material-icons-outlined">people</span> Drivers Behavior
+                </a>
+            </li>
+            
+            <li class="sidebar-list-item">
+              <a href="/login">
+                 <span class="material-icons-outlined">logout</span>LogOut
+             </a>
+             </li>
+          </ul>
+        </aside>
+        <!-- End Sidebar -->
+        <style>
+            /* Wrapper to center the chart */
+            .chart-wrapper {
+                display: flex;
+                justify-content: center; /* Center horizontally */
+                align-items: center; /* Center vertically, if needed */
+                width: 100%; /* Full width of the parent container */
+                height: 500px; /* Optional: set a height for the wrapper */
+            }
+        
+            /* Chart styles */
+            #makeChart {
+                width: 100%; /* Make the chart take 100% of the wrapper */
+                height: 100%; /* Or set it to a fixed height if you prefer */
+            }
+        </style>
+        
+        <div class="chart-wrapper">
+            <div id="makeChart" style="margin-top: 250px;"></div>
+        </div>
+   
+
+    <script>
+        const makeData = {{ maintenance_by_make | safe }};
+
+        // Prepare data for make chart
+        const makes = makeData.map(item => item.Make);
+        const costs = makeData.map(item => item['Maintenance Cost']);
+
+        const data = [{
+            x: makes,
+            y: costs,
+            type: 'bar',
+            marker: {
+                color: '#FF7F50',
+                line: {
+                    color: '#FF7F51',
+                    width: 1
+                }
+            }
+        }];
+
+        const layout = {
+            title: 'Total Maintenance Cost by Vehicle Make',
+            xaxis: {
+                title: 'Vehicle Make'
+            },
+            yaxis: {
+                title: 'Maintenance Cost (in currency)'
+            }
+        };
+
+        Plotly.newPlot('makeChart', data, layout);
+    </script>
+</body>
+</html>

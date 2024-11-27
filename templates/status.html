@@ -1,4 +1,3 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,115 +63,46 @@
                         </a>
                       </li>
                       <li class="sidebar-list-item">
-                        <a href="/login">
-                           <span class="material-icons-outlined">logout</span>LogOut
-                       </a>
-                       </li>
+                        <a href="/maintenance">
+                            <span class="material-icons-outlined">build</span> Maintenance
+                        </a>
+                    </li>
+                    
+                    <li class="sidebar-list-item">
+                        <a href="/behavior">
+                            <span class="material-icons-outlined">people</span> Drivers Behavior
+                        </a>
+                    </li>
+                    
+                    <li class="sidebar-list-item">
+                      <a href="/login">
+                         <span class="material-icons-outlined">logout</span>LogOut
+                     </a>
+                     </li>
+                  </ul>
             </ul>
         </aside>
         <!-- End Sidebar -->
+     
+
+
+        
   <!-- Main Content -->
   <main class="main-container">
-    <div class="main-title">
-     <!-- Dropdown -->
-     <label for="columnSelect">Select Column:</label>
-     <select id="columnSelect"></select>
- 
-            <!-- Options will be populated dynamically -->
-        </select>        
+    <div class="main-title-status">
+    <form method="POST">
+        <label for="status_type">Select Status Type: </label>
+        <select name="status_type" id="columnSelect" onchange="this.form.submit()">
+            <option value="Charging Status" {% if status_type == 'Charging Status' %}selected{% endif %}>Charging Status</option>
+            <option value="Working Condition" {% if status_type == 'Working Condition' %}selected{% endif %}>Working Condition</option>
+        </select>
+    </form>
+
+    <!-- Plotly Chart -->
+    <div id="chart-container">
+        {{ graph_html | safe }}
     </div>
-    <!-- Chart -->
-    <div id="chart" style="margin-top:150px; width: 100%; height: 500px;"></div>
 </main>
 </div>
-
-<!-- End Main Content -->
-
-   
-    
-
-    <script>
-        const dropdown = document.getElementById('columnSelect');
-        const defaultColumn = "Range (km)"; // Default column to analyze
-
-        // Function to load headers into the dropdown
-        async function loadHeaders() {
-            try {
-                const response = await fetch('/data?action=headers');
-                const headers = await response.json();
-                headers.forEach(header => {
-                    const option = document.createElement('option');
-                    option.value = header;
-                    option.textContent = header;
-                    dropdown.appendChild(option);
-                });
-
-                // Select the default column and render its chart
-                if (headers.includes(defaultColumn)) {
-                    dropdown.value = defaultColumn;
-                    fetchDataAndRenderChart(defaultColumn);
-                }
-            } catch (error) {
-                console.error('Error fetching headers:', error);
-            }
-        }
-
-        // Function to fetch data and render the chart
-        async function fetchDataAndRenderChart(column) {
-            try {
-                const response = await fetch(`/data?action=conditionalCounts&column=${column}`);
-                const data = await response.json();
-
-                if (data.error) {
-                    console.error(data.error);
-                    return;
-                }
-
-                // Prepare data for the bar chart
-                const ranges = Object.keys(data); // Unique ranges or values
-                const status0Counts = ranges.map(range => data[range]['0'] || 0); // Count for status 0
-                const status1Counts = ranges.map(range => data[range]['1'] || 0); // Count for status 1
-
-                // Create traces for the chart
-                const trace0 = {
-                    x: ranges, // Ranges or column values on x-axis
-                    y: status0Counts, // Counts for status 0
-                    type: 'bar',
-                    name: 'Status 0 (Off)',
-                    marker: { color: 'rgba(255, 99, 132, 0.6)' },
-                };
-
-                const trace1 = {
-                    x: ranges, // Ranges or column values on x-axis
-                    y: status1Counts, // Counts for status 1
-                    type: 'bar',
-                    name: 'Status 1 (On)',
-                    marker: { color: 'rgba(54, 162, 235, 0.6)' },
-                };
-
-                const layout = {
-                    title: `Conditional Distribution of ${column} by Vehicle Status`,
-                    xaxis: { title: column },
-                    yaxis: { title: 'Count' },
-                    barmode: 'group', // Group bars for comparison
-                };
-
-                // Render the chart
-                Plotly.newPlot('chart', [trace0, trace1], layout);
-            } catch (error) {
-                console.error('Error fetching or rendering chart data:', error);
-            }
-        }
-
-        // Update chart on dropdown selection change
-        dropdown.addEventListener('change', () => {
-            fetchDataAndRenderChart(dropdown.value);
-        });
-
-        // Load headers and initialize chart on page load
-        loadHeaders();
-    </script>
 </body>
 </html>
-
-

@@ -1,0 +1,189 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditional Status Distribution Chart</title>
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+</head>
+<body>
+    <h1>Status Distribution Chart</h1>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <span class="material-icons-outlined">electric_car</span> EV FLEET
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+    
+            <ul class="sidebar-list">
+                <li class="sidebar-list-item">
+                    <a href="#" target="_blank">
+                        <span class="material-icons-outlined">library_books</span> EV-Introduction
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="dataset">
+                        <span class="material-icons-outlined">dataset</span>
+                        DataSet
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/distribution">
+                        <span class="material-icons-outlined">show_chart</span> Distribution
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/relation">
+                        <span class="material-icons-outlined">account_tree</span> RelationShip
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/status">
+                        <span class="material-icons-outlined">check_circle</span> StatusCount
+                    </a>
+                    <li class="sidebar-list-item">
+                        <a href="/pie">
+                          <span class="material-icons-outlined">donut_large</span> PieChart
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/predict">
+                          <span class="material-icons-outlined">analytics</span>Prediction
+                        </a>
+                      </li>
+                      <li class="sidebar-list-item">
+                        <a href="/maintenance">
+                            <span class="material-icons-outlined">build</span> Maintenance
+                        </a>
+                    </li>
+                    
+                    <li class="sidebar-list-item">
+                        <a href="/behavior">
+                            <span class="material-icons-outlined">people</span> Drivers Behavior
+                        </a>
+                    </li>
+                    
+                    <li class="sidebar-list-item">
+                      <a href="/login">
+                         <span class="material-icons-outlined">logout</span>LogOut
+                     </a>
+                     </li>
+                  </ul>
+            </ul>
+        </aside>
+        <!-- End Sidebar -->
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="main-title">
+     <!-- Dropdown -->
+     <label for="columnSelect">Select Column:</label>
+     <select id="columnSelect"></select>
+ 
+            <!-- Options will be populated dynamically -->
+        </select>        
+    </div>
+    <!-- Chart -->
+    <div id="chart" style="margin-top:150px; width: 100%; height: 500px;"></div>
+</main>
+</div>
+
+<!-- End Main Content -->
+
+   
+    
+
+    <script>
+        const dropdown = document.getElementById('columnSelect');
+        const defaultColumn = "Range (km)"; // Default column to analyze
+
+        // Function to load headers into the dropdown
+        async function loadHeaders() {
+            try {
+                const response = await fetch('/data?action=headers');
+                const headers = await response.json();
+                headers.forEach(header => {
+                    const option = document.createElement('option');
+                    option.value = header;
+                    option.textContent = header;
+                    dropdown.appendChild(option);
+                });
+
+                // Select the default column and render its chart
+                if (headers.includes(defaultColumn)) {
+                    dropdown.value = defaultColumn;
+                    fetchDataAndRenderChart(defaultColumn);
+                }
+            } catch (error) {
+                console.error('Error fetching headers:', error);
+            }
+        }
+
+        // Function to fetch data and render the chart
+        async function fetchDataAndRenderChart(column) {
+            try {
+                const response = await fetch(`/data?action=conditionalCounts&column=${column}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+
+                // Prepare data for the bar chart
+                const ranges = Object.keys(data); // Unique ranges or values
+                const status0Counts = ranges.map(range => data[range]['0'] || 0); // Count for status 0
+                const status1Counts = ranges.map(range => data[range]['1'] || 0); // Count for status 1
+
+                // Create traces for the chart
+                const trace0 = {
+                    x: ranges, // Ranges or column values on x-axis
+                    y: status0Counts, // Counts for status 0
+                    type: 'bar',
+                    name: 'Status 0 (Off)',
+                    marker: { color: 'rgba(255, 99, 132, 0.6)' },
+                };
+
+                const trace1 = {
+                    x: ranges, // Ranges or column values on x-axis
+                    y: status1Counts, // Counts for status 1
+                    type: 'bar',
+                    name: 'Status 1 (On)',
+                    marker: { color: 'rgba(54, 162, 235, 0.6)' },
+                };
+
+                const layout = {
+                    title: `Conditional Distribution of ${column} by Vehicle Status`,
+                    xaxis: { title: column },
+                    yaxis: { title: 'Count' },
+                    barmode: 'group', // Group bars for comparison
+                };
+
+                // Render the chart
+                Plotly.newPlot('chart', [trace0, trace1], layout);
+            } catch (error) {
+                console.error('Error fetching or rendering chart data:', error);
+            }
+        }
+
+        // Update chart on dropdown selection change
+        dropdown.addEventListener('change', () => {
+            fetchDataAndRenderChart(dropdown.value);
+        });
+
+        // Load headers and initialize chart on page load
+        loadHeaders();
+    </script>
+</body>
+</html>

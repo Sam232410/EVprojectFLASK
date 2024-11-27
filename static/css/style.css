@@ -362,3 +362,97 @@ h1 {
   line-height: 1.5;
 }
 
+
+
+/* style for driver behavior table */
+
+ /* Main Content Area */
+ .data-box {
+  grid-area: main;
+  background: linear-gradient(145deg, #3b3b3b, #292929);
+  box-shadow: 5px 5px 15px #1a1a1a, -5px -5px 15px #4c4c4c;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 40px);
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 100px;
+  background-color: #414141;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+thead th {
+  background-color: #575757;
+  color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #575757;
+}
+
+tbody td {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  border-bottom: 1px solid #555;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Scrollbar Customization */
+.data-box::-webkit-scrollbar {
+  width: 10px;
+}
+
+.data-box::-webkit-scrollbar-track {
+  background: #2b2b2b;
+}
+
+.data-box::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 5px;
+}
+
+.data-box::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+
+/* status graph */
+/* Positioning the dropdown and label */
+.main-title-status{
+  position: relative; /* To allow proper placement of its child elements */
+  margin-top: 50px; /* Aligns it to the top of the parent container */
+  left: 0; /* Ensures alignment starts from the left */
+  display: flex; /* Align items horizontally (if needed) */
+  flex-direction: column; /* Stack label and dropdown vertically */
+  gap: 10px; /* Adds space between label and dropdown */
+  padding: 10px; /* Optional padding around the form */
+  z-index: 10; /* Ensures it appears above other elements */
+}
+#chart-container{
+  position: relative; /* To allow proper placement of its child elements */
+  margin-top: 90px;
+  width: 100%; /* Make the chart take 100% of the wrapper */
+  height: 100%; /* Or set it to a fixed height if you prefer */
+
+}

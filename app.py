@@ -10,7 +10,9 @@ import pickle
 import numpy as np
 import pandas as pd
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-
+import smtplib
+import plotly.express as px
+import plotly.io as pio
 
 
 # Initialize Flask app and database
@@ -320,9 +322,61 @@ def driver():
 def distribution():
     return render_template('distribution.html')
 
-@app.route('/status')
+# @app.route('/status')
+# def status():
+#     return render_template('status.html')
+
+# Add Working Condition and Charging Status based on Vehicle Status
+data['Working Condition'] = data['Vehicle Status'].apply(lambda x: 'Working' if x == 1 else 'Not Working')
+data['Charging Status'] = data['Vehicle Status'].apply(lambda x: 'Charging Right Now' if x == 1 else 'Not Charging')
+
+# Get unique vehicle names (or makes)
+vehicle_names = data['Make'].unique()
+
+@app.route("/status", methods=["GET", "POST"])
 def status():
-    return render_template('status.html')
+    status_type = request.form.get("status_type", "Charging Status")
+    
+    # Initialize an empty DataFrame to store the randomly selected entries
+    random_entries = pd.DataFrame()
+
+    # Loop through each unique vehicle name and fetch a random entry
+    for vehicle in vehicle_names:
+        vehicle_data = data[data['Make'] == vehicle]  # Filter data for the current vehicle
+        random_row = vehicle_data.sample(n=1)  # Randomly pick one row for this vehicle
+        random_entries = pd.concat([random_entries, random_row])
+
+    if status_type == "Charging Status":
+        # Count the occurrences of Charging Status from random entries
+        status_count = random_entries['Charging Status'].value_counts().reset_index()
+        status_count.columns = ['Charging Status', 'Count']
+    else:  # Working Condition
+        # Count the occurrences of Working Condition from random entries
+        status_count = random_entries['Working Condition'].value_counts().reset_index()
+        status_count.columns = ['Working Condition', 'Count']
+
+    # Generate the Plotly graph
+    fig = px.bar(status_count, 
+                 x=status_count.columns[0],  # This will be Charging Status or Working Condition
+                 y="Count", 
+                 title=f"{status_type} Count (Random Entry per Vehicle)",
+                 labels={status_count.columns[0]: status_type, "Count": "Vehicle Count"})
+
+    fig.update_layout(
+        width=1000,  # Chart width
+        height=500,  # Chart height
+        margin=dict(t=30, l=20, r=20, b=20),  # Margins: top, left, right, bottom
+        title="Vehicle Status",
+        # yaxis_range=[0, 7],  # Set the Y-axis range from 0 to 7
+        hovermode="closest"
+    )
+
+    # Convert the Plotly graph to HTML to embed it in the webpage
+    graph_html = pio.to_html(fig, full_html=False)
+
+    return render_template("status.html", graph_html=graph_html, status_type=status_type)
+
+
 
 @app.route('/pie')
 def pie():
@@ -387,33 +441,36 @@ def get_data():
     
 
         
-    elif action == 'conditionalCounts':
-        selected_column = request.args.get('column')
-        headers = data[0]
+    # elif action == 'conditionalCounts':
+    #     selected_column = request.args.get('column')
+    #     headers = data[0]
 
-        # Ensure columns exist
-        try:
-            status_index = headers.index('Vehicle Status')
-            selected_index = headers.index(selected_column)
-        except ValueError:
-            return jsonify({'error': 'Invalid column'}), 400
+    #     # Ensure columns exist
+    #     try:
+    #         status_index = headers.index('Vehicle Status')
+    #         selected_index = headers.index(selected_column)
+    #     except ValueError:
+    #         return jsonify({'error': 'Invalid column'}), 400
         
-        counts = {}
+    #     counts = {}
 
-        for row in data[1:]:
-            status = row[status_index]
-            value = row[selected_index]
+    #     for row in data[1:]:
+    #         status = row[status_index]
+    #         value = row[selected_index]
 
-            # Skip invalid rows
-            if status not in ['0', '1'] or not value:
-                continue
+    #         # Skip invalid rows
+    #         if status not in ['0', '1'] or not value:
+    #             continue
             
-            if value not in counts:
-                counts[value] = {'0': 0, '1': 0}
+    #         if value not in counts:
+    #             counts[value] = {'0': 0, '1': 0}
             
-            counts[value][status] += 1
+    #         counts[value][status] += 1
 
-        return jsonify(counts)
+    #     return jsonify(counts)
+    
+    
+    
     
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
@@ -453,6 +510,94 @@ def predict():
             return render_template('predict.html', prediction_text=f"Error: {str(e)}")
     else:
         return render_template('predict.html', prediction_text="")
+
+
+
+####maintenance
+@app.route("/maintenance")
+def maintenance():
+     # Aggregate total maintenance cost by vehicle make
+    maintenance_by_make = data.groupby("Make")["Maintenance Cost"].mean().reset_index()
+
+    # Convert to dictionaries for JSON usage
+    maintenance_by_make = maintenance_by_make.to_dict(orient="records")
+
+    return render_template("maintenance.html",
+                           maintenance_by_make=maintenance_by_make)
+
+    # # Aggregate maintenance cost by month
+    # #monthly_maintenance = data.groupby("Month")["Maintenance Cost"].sum().reset_index()
+
+    # # Aggregate average maintenance cost by vehicle make
+    # avg_maintenance_by_make = data.groupby("Make")["Maintenance Cost"].mean().reset_index()
+
+    # # Convert to dictionaries for JSON usage
+    # #monthly_maintenance = monthly_maintenance.to_dict(orient="records")
+    # avg_maintenance_by_make = avg_maintenance_by_make.to_dict(orient="records")
+
+    # return render_template("maintenance.html",
+    #                        avg_maintenance_by_make=avg_maintenance_by_make)
+
+
+##########sharing notifications for overspeeding
+# Function to send email notifications
+# Function to send email notifications
+
+# Define a mapping of driver names to email addresses
+driver_email_map = {
+    "chandu": "masettychandana@gmail.com",
+    "praneetha": "praneethachutla13@gmail.com",
+    "sahithya": "sahithyamadala@gmail.com",
+    "samiksha": "waghsamiksha05@gmail.com",
+
+    # Add more driver names and their emails here
+}
+
+# Function to send email notifications
+def send_notification(driver_name, email):
+    sender_email = "email23testing@gmail.com"  # Replace with your email
+    sender_password = "owpp amrr cdbi soog"  # Replace with your app password
+    subject = "Overspeeding Alert"
+    message = f"Dear {driver_name},\n\nYou have been observed driving at speeds exceeding 120 km/h. Please adhere to the speed limits for safety.\n\nRegards,\nFleet Management Team"
+
+    # Email setup
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, f"Subject: {subject}\n\n{message}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+    
+
+@app.route("/behavior")
+def behavior():
+    # Filter overspeeding drivers
+    overspeeding = data[data["Speed"] > 120]
+    
+    # Group by driver name and get the top speed for each driver
+    top_speed = overspeeding.groupby("Driver")["Speed"].max().reset_index(name="Top Speed")
+
+    # Map email addresses to drivers
+    top_speed["Email"] = top_speed["Driver"].apply(lambda x: driver_email_map.get(x, "email23testing@gmail.com"))
+
+    # Convert to dictionary for passing to the template
+    top_speed = top_speed.to_dict(orient="records")
+
+    return render_template("behavior.html", drivers=top_speed)
+
+
+@app.route("/notify", methods=["POST"])
+def notify():
+    driver_name = request.form.get("driver_name")
+    email = request.form.get("email")
+
+    if send_notification(driver_name, email):
+        return jsonify({"success": True, "message": "Notification sent successfully."})
+    else:
+        return jsonify({"success": False, "message": "Failed to send notification."})
 
 
 
