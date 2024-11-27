@@ -34,9 +34,9 @@ engine = create_engine(f'mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_ho
 
 
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.secret_key = 'your_secret_key_here'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your_secret_key_here'
 
 
 # Email configuration
