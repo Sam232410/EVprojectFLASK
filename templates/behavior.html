@@ -83,44 +83,30 @@
         <!-- End Sidebar -->
 
         <!-- Main Content -->
-        <div class="data-box">
-
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Driver Name</th>
-                <th>Top Speed (km/h)</th>
-                <th>Notify</th>
-            </tr>
-        </thead>
-        <tbody>
+        <div class="header">
+            <h1>Overspeeding Drivers</h1>
+        </div>
+    
+        <div class="intro-driver">
             {% for driver in drivers %}
-            <tr>
-                <td>{{ driver.Driver }}</td>
-                <td>{{ driver['Top Speed'] }}</td>
-                <td>
-                    <button onclick="sendNotification('{{ driver.Driver }}', '{{ driver.Email }}')">Send Notification</button>
-                </td>
-            </tr>
+            <div class="driver-card">
+              <div class="driver-name">{{ driver.Driver }}</div>
+              <div class="top-speed">Top Speed: {{ driver['Top Speed'] }} km/h</div>
+              <button class="notify-button" onclick="sendNotification('{{ driver.Driver }}', '{{ driver.Email }}')">Send Alert!!</button>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
-
-
-
-    <script>
-        function sendNotification(driverName, email) {
-            $.post("/notify", { driver_name: driverName, email: email }, function(response) {
-                if (response.success) {
-                    alert("Notification sent successfully.");
-                } else {
-                    alert("Failed to send notification.");
-                }
-            });
-        }
-    </script>
+          </div>
+    
+        <script>
+            function sendNotification(driverName, email) {
+                $.post("/notify", { driver_name: driverName, email: email }, function(response) {
+                    if (response.success) {
+                        alert("Notification sent successfully.");
+                    } else {
+                        alert("Failed to send notification.");
+                    }
+                });
+            }
+        </script>
 </body>
 </html>

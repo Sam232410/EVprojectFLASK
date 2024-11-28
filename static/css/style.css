@@ -456,3 +456,60 @@ tbody tr:last-child td {
   height: 100%; /* Or set it to a fixed height if you prefer */
 
 }
+
+
+/* drivers behavior */
+/* Intro Content Styling */
+.intro-driver {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust grid layout */
+  gap: 20px;
+}
+
+.driver-card {
+  background-color: #3b3b3b;
+  padding: 15px 20px;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: inset 2px 2px 5px #292929, inset -2px -2px 5px #4c4c4c;
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-top: 120px; /* Adds top margin between boxes */
+  height: 150px; /* Ensures the height adjusts based on content */
+  display: flex;
+  flex-direction: column; /* Aligns items vertically within the card */
+}
+
+.driver-card:hover {
+  transform: scale(1.03);
+  box-shadow: 4px 4px 10px #1a1a1a, -4px -4px 10px #4c4c4c;
+}
+
+.driver-card .driver-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.driver-card .top-speed {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.notify-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.notify-button:hover {
+  background-color: #2c3e50;
+}

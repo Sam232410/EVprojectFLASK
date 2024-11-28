@@ -414,8 +414,8 @@ def distribution():
 #     return render_template('status.html')
 
 # Add Working Condition and Charging Status based on Vehicle Status
-data['Working Condition'] = data['Vehicle Status'].apply(lambda x: 'Working' if x == 1 else 'Not Working')
-data['Charging Status'] = data['Vehicle Status'].apply(lambda x: 'Charging Right Now' if x == 1 else 'Not Charging')
+data['Working Condition'] = data['Vehicle Status'].apply(lambda x: '1' if x == 1 else '0')
+data['Charging Status'] = data['Vehicle Status'].apply(lambda x: '1' if x == 1 else '0')
 
 # Get unique vehicle names (or makes)
 vehicle_names = data['Make'].unique()
@@ -448,7 +448,8 @@ def status():
                  y="Count", 
                  title=f"{status_type} Count (Random Entry per Vehicle)",
                  labels={status_count.columns[0]: status_type, "Count": "Vehicle Count"})
-
+    # Update bar color to orange
+    fig.update_traces(marker_color="#FF7F50")
     fig.update_layout(
         width=1000,  # Chart width
         height=500,  # Chart height
