@@ -124,6 +124,11 @@ def register():
             flash('Passwords do not match!', 'error')
             return redirect(url_for('register'))
 
+        # Password strength rules
+        if not re.match(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+            flash('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.', 'error')
+            return redirect(url_for('register'))
+
         # Check email format
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('Invalid email format!', 'error')

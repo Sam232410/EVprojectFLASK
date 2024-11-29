@@ -100,6 +100,10 @@
             background-color: #dc3545;
             color: white;
         }
+        small {
+            display: block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -132,10 +136,14 @@
             <input type="date" id="dob" name="dob" required>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Your Password" required>
+            <input type="password" id="password" name="password" placeholder="Your Password" required onkeyup="validatePassword()">
+            <small id="password-hint" style="color: red;">
+                Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.
+            </small>
 
             <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Your Password" required>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Your Password" required onkeyup="checkPasswordMatch()">
+            <small id="confirm-password-hint" style="color: red;"></small>
 
             <label for="role">Select Role:</label>
             <div style="display: flex; align-items: center;">
@@ -184,6 +192,34 @@
                 this.style.display = 'none';
             }
         });
+
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const hint = document.getElementById('password-hint');
+            const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            if (!regex.test(password)) {
+                hint.style.color = 'red';
+                hint.textContent = 'Weak password. Ensure it meets the requirements.';
+            } else {
+                hint.style.color = 'green';
+                hint.textContent = 'Strong password.';
+            }
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirmHint = document.getElementById('confirm-password-hint');
+
+            if (password !== confirmPassword) {
+                confirmHint.style.color = 'red';
+                confirmHint.textContent = 'Passwords do not match!';
+            } else {
+                confirmHint.style.color = 'green';
+                confirmHint.textContent = 'Passwords match.';
+            }
+        }
     </script>
 </body>
 </html>
