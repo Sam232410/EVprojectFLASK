@@ -238,7 +238,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Get the email or phone number from the form
+        # Get the email or phone number and password from the form
         email_or_phone = request.form.get('email_or_phone')  # Use get() to avoid KeyError
         password = request.form.get('password')
 
@@ -247,23 +247,32 @@ def login():
             (User.email == email_or_phone) | (User.phone == email_or_phone)
         ).first()
 
-        if user and check_password_hash(user.password, password):
-            # Store user details in session
-            session['user_id'] = user.id
-            session['user_name'] = user.name
-            session['user_role'] = user.role
-            flash(f'Welcome {user.name}! Login successful.', 'success')
-            
-            # Redirect based on user role
-            if user.role == 'Driver':
-                return redirect(url_for('driver'))  # Redirect to driver page if the role is Driver
+        if user:
+            # If user exists, check the password
+            if check_password_hash(user.password, password):
+                # Store user details in session
+                session['user_id'] = user.id
+                session['user_name'] = user.name
+                session['user_role'] = user.role
+                flash(f'Welcome {user.name}! Login successful.', 'success')
+                
+                # Redirect based on user role
+                if user.role == 'Driver':
+                    return redirect(url_for('driver'))  # Redirect to driver page if the role is Driver
+                else:
+                    return redirect(url_for('index'))  # Redirect to welcome page if the role is not Driver
             else:
-                return redirect(url_for('index'))  # Redirect to welcome page if the role is not Driver
+                # Incorrect password
+                flash('Incorrect password. Please try again.', 'error')
         else:
-            flash('Invalid credentials. Please try again.', 'error')
-            return redirect(url_for('login'))  # Stay on login page if login fails
+            # No user found with the given email or phone
+            flash('No account found with the provided email or phone number.', 'error')
+        
+        # Redirect back to login page
+        return redirect(url_for('login'))
 
-    return render_template('login.html')  # Use a separate template for login if needed
+    return render_template('login.html')
+
 
 
 #####FORGOT-PASSWORD
