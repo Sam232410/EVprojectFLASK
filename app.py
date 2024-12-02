@@ -669,17 +669,23 @@ def send_notification(driver_name, email):
 def behavior():
     # Filter overspeeding drivers
     overspeeding = data[data["Speed"] > 120]
-    
-    # Group by driver name and get the top speed for each driver
-    top_speed = overspeeding.groupby("Driver")["Speed"].max().reset_index(name="Top Speed")
+
+    # Group by driver and get the first instance of overspeeding along with the date
+    overspeeding_info = (
+        overspeeding.groupby("Driver")
+        .apply(lambda x: x.iloc[0][["Speed", "Dates"]])
+        .reset_index()
+    )
 
     # Map email addresses to drivers
-    top_speed["Email"] = top_speed["Driver"].apply(lambda x: driver_email_map.get(x, "email23testing@gmail.com"))
+    overspeeding_info["Email"] = overspeeding_info["Driver"].apply(
+        lambda x: driver_email_map.get(x, "email23testing@gmail.com")
+    )
 
     # Convert to dictionary for passing to the template
-    top_speed = top_speed.to_dict(orient="records")
+    overspeeding_info = overspeeding_info.rename(columns={"Date": "Date Exceeded"}).to_dict(orient="records")
 
-    return render_template("behavior.html", drivers=top_speed)
+    return render_template("behavior.html", drivers=overspeeding_info)
 
 
 @app.route("/notify", methods=["POST"])

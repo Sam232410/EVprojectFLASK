@@ -82,31 +82,35 @@
         </aside>
         <!-- End Sidebar -->
 
-        <!-- Main Content -->
-        <div class="header">
-            <h1>Overspeeding Drivers</h1>
+<!-- Main Content -->
+<div class="header">
+    <h1>Overspeeding Drivers</h1>
+</div>
+
+<div class="intro-driver">
+    {% for driver in drivers %}
+    <div class="driver-card">
+        <div class="driver-name">{{ driver.Driver }}</div>
+        <div class="overspeed-info">
+            Exceeded Speed Limit of 120 km/h on {{ driver.Dates }}
         </div>
-    
-        <div class="intro-driver">
-            {% for driver in drivers %}
-            <div class="driver-card">
-              <div class="driver-name">{{ driver.Driver }}</div>
-              <div class="top-speed">Top Speed: {{ driver['Top Speed'] }} km/h</div>
-              <button class="notify-button" onclick="sendNotification('{{ driver.Driver }}', '{{ driver.Email }}')">Send Alert!!</button>
-            </div>
-            {% endfor %}
-          </div>
-    
-        <script>
-            function sendNotification(driverName, email) {
-                $.post("/notify", { driver_name: driverName, email: email }, function(response) {
-                    if (response.success) {
-                        alert("Notification sent successfully.");
-                    } else {
-                        alert("Failed to send notification.");
-                    }
-                });
+        <button class="notify-button" onclick="sendNotification('{{ driver.Driver }}', '{{ driver.Email }}')">
+            Send Alert!!
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function sendNotification(driverName, email) {
+        $.post("/notify", { driver_name: driverName, email: email }, function(response) {
+            if (response.success) {
+                alert("Notification sent successfully.");
+            } else {
+                alert("Failed to send notification.");
             }
-        </script>
+        });
+    }
+</script>
 </body>
 </html>
