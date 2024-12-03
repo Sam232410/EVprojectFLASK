@@ -34,7 +34,7 @@ app = Flask(__name__)
 
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:sam@localhost/evUSERS'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:praneetha@localhost/evUSERS'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key_here'
 
